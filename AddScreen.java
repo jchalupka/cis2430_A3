@@ -70,25 +70,23 @@ public class AddScreen extends JPanel {
         g.gridy = 2;
         inputPanel.add(nameField, g);
 
-
-        priceLabel = new JLabel("Price: ");
-        g.gridx = 0;
-        g.gridy = 3;
-        inputPanel.add(priceLabel, g);
-        priceField = new JTextField(15);
-        g.gridx = 1;
-        g.gridy = 3;
-        inputPanel.add(priceField, g);
-
         yearLabel = new JLabel("Year: ");
         g.gridx = 0;
-        g.gridy = 4;
+        g.gridy = 3;
         inputPanel.add(yearLabel, g);
         yearField = new JTextField(15);
         g.gridx = 1;
-        g.gridy = 4;
+        g.gridy = 3;
         inputPanel.add(yearField, g);
 
+        priceLabel = new JLabel("Price: ");
+        g.gridx = 0;
+        g.gridy = 4;
+        inputPanel.add(priceLabel, g);
+        priceField = new JTextField(15);
+        g.gridx = 1;
+        g.gridy = 4;
+        inputPanel.add(priceField, g);
 
         authorsLabel = new JLabel("Authors");
         g.gridx = 0;
@@ -139,23 +137,24 @@ public class AddScreen extends JPanel {
 
         this.add(rightPanel, BorderLayout.EAST);
 
-	JPanel bottomPanel = new JPanel();
-	bottomPanel.setLayout(new BorderLayout());
+    	JPanel bottomPanel = new JPanel();
+    	bottomPanel.setLayout(new BorderLayout());
 
         bottomPanel.add(new JLabel("Messages"), BorderLayout.NORTH);
 
-	textArea = new JTextArea();
-	textArea.setEditable(false);
+    	textArea = new JTextArea();
+    	textArea.setEditable(false);
 
-	JScrollPane scroll = new JScrollPane(textArea);
+    	JScrollPane scroll = new JScrollPane(textArea);
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 
-	bottomPanel.setPreferredSize(new Dimension(10,100));
-	bottomPanel.add(scroll, BorderLayout.CENTER);
+    	bottomPanel.setPreferredSize(new Dimension(100,200));
+    	bottomPanel.add(scroll, BorderLayout.CENTER);
 
         this.add(bottomPanel, BorderLayout.SOUTH);
         
+        typeComboBox.setSelectedItem("Book");
     }
 
     protected String getType() {
@@ -166,8 +165,8 @@ public class AddScreen extends JPanel {
         ArrayList<String> result = new ArrayList<String>();
         result.add(idField.getText());
         result.add(nameField.getText());
-        result.add(priceField.getText());
         result.add(yearField.getText());
+        result.add(priceField.getText());
         result.add(authorsField.getText());
         result.add(publisherField.getText());
         result.add(makerField.getText());
@@ -177,38 +176,77 @@ public class AddScreen extends JPanel {
 
     class NotifyTypeChange implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            System.out.println("State changed to: " + getType());
-            if (getType().equals("Book")) {
-                authorsLabel.setVisible(true);
-                authorsField.setVisible(true);
-                publisherLabel.setVisible(true);
-                publisherField.setVisible(true);
+            resetFields();
+        }
+    }
 
-                makerLabel.setVisible(false);
-                makerField.setVisible(false);
-            } else if (getType().equals("Electronic")) {
-                makerLabel.setVisible(true);
-                makerField.setVisible(true);
+    private void resetFields() {
+        System.out.println("State changed to: " + getType());
+        if (getType().equals("Book")) {
+            authorsLabel.setVisible(true);
+            authorsField.setVisible(true);
+            publisherLabel.setVisible(true);
+            publisherField.setVisible(true);
 
-                authorsLabel.setVisible(false);
-                authorsField.setVisible(false);
-                publisherLabel.setVisible(false);
-                publisherField.setVisible(false);
-            } else {
-                System.out.println("An error has occcured, this is not a recognized Type.");
-            }
+            makerLabel.setVisible(false);
+            makerField.setVisible(false);
+        } else if (getType().equals("Electronic")) {
+            makerLabel.setVisible(true);
+            makerField.setVisible(true);
+
+            authorsLabel.setVisible(false);
+            authorsField.setVisible(false);
+            publisherLabel.setVisible(false);
+            publisherField.setVisible(false);
+        } else {
+            System.out.println("An error has occcured, this is not a recognized Type.");
         }
     }
 
     class AddButtonPressed implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            System.out.println("Add button pressed");
+            addProduct();
+            resetFields();
 
-            /*This is the handler*/
-            ArrayList<String> fields = getFields();
-            System.out.println(fields.toString());
+        }
+    }
+
+    private void addProduct() {
+        System.out.println("Add button pressed");
+
+        /*This is the handler*/
+        ArrayList<String> fields = getFields();
+
+        String id, name, price, year, author, publisher, maker;
+        id = fields.get(0);
+        name = fields.get(1);
+        year = fields.get(2);
+        price = fields.get(3);
+        author = fields.get(4);
+        publisher = fields.get(5);
+        maker = fields.get(6);
+
+        System.out.println(fields);
 
 
+        try{  
+            Product product = null;
+
+            if (getType().equals("Book")) {
+                product = new Book(id, name, year, price, author, publisher);
+            } else if (getType().equals("Electronic")) {
+                product = new Electronic(id, name, year, price, maker);
+            } else {
+                System.out.println("An error has occcured, this is not a recognized Type.");
+            }
+
+            StoreSearch.addToStore(product);
+            textArea.setText("Added Product:\n" + product.toString());
+
+        } catch(IllegalArgumentException error) {
+            System.out.println("Could not add product");
+            String msg = "Error creating product: " + error.getMessage();
+            JOptionPane.showMessageDialog(null, msg, "Error", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -232,5 +270,13 @@ public class AddScreen extends JPanel {
         frame.add(addScreen);
         frame.setVisible(true);
         frame.pack();
+
+        idField.setText("123456");
+        nameField.setText("Harry Potter");
+        priceField.setText("29.99");
+        yearField.setText("2004");
+        authorsField.setText("Rowlings");
+        publisherField.setText("BloomsBerg");
+
     }
 }

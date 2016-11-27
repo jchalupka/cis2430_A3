@@ -1,5 +1,3 @@
-package edu.onlineStore;
-
 import java.util.*;
 
 /**
@@ -38,6 +36,25 @@ public class Search {
 		
 		if (keyWords == null || keyWords.size() == 0) this.keyWords = null;
 		else this.keyWords = keyWords;
+
+		Integer startYearValue = 0;
+		Integer endYearValue = 0;
+
+
+
+		if (this.startYear != null && this.endYear  != null) {
+			try {
+				startYearValue = Integer.valueOf(startYear);
+				endYearValue = Integer.valueOf(endYear);
+			} catch(NumberFormatException e) {
+				throw new IllegalArgumentException("Years must be integers");
+			}
+
+			if (startYearValue > endYearValue)
+				throw new IllegalArgumentException("Start year cannot be greater than end year");
+		}
+
+
 	}
 
 	/**

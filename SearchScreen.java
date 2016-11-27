@@ -63,7 +63,7 @@ public class SearchScreen extends JPanel {
         rightPanel.setLayout(new GridBagLayout());
 
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(2,1,0,30));
+        buttonPanel.setLayout(new GridLayout(2,1,0,80));
         
         JButton resetButton = new JButton("Reset");
         resetButton.addActionListener(new ResetButtonPressed());
@@ -81,15 +81,16 @@ public class SearchScreen extends JPanel {
 		JPanel bottomPanel = new JPanel();
 		bottomPanel.setLayout(new BorderLayout());
 
-	        bottomPanel.add(new JLabel("Messages"), BorderLayout.NORTH);
+	    bottomPanel.add(new JLabel("Messages"), BorderLayout.NORTH);
 
-		textArea = new JTextArea(5,10);
+		textArea = new JTextArea();
 		textArea.setEditable(false);
 
 		JScrollPane scroll = new JScrollPane(textArea);
 	    scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 	    scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-
+    	
+    	bottomPanel.setPreferredSize(new Dimension(100,200));
 		bottomPanel.add(scroll, BorderLayout.CENTER);
 
 	    this.add(bottomPanel, BorderLayout.SOUTH);
@@ -109,6 +110,34 @@ public class SearchScreen extends JPanel {
 	class SearchButtonPressed implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             System.out.println("Search button pressed");
+
+            ArrayList<String> fields = getFields();
+            String idToSearch = fields.get(0);
+            ArrayList<String> nameKeywordsToSearch = new ArrayList<String>(Arrays.asList(fields.get(1).split(" +")));
+            String startYearToSearch = fields.get(2);
+            String endYearToSearch = fields.get(3);
+
+            try {
+	            Search search = new Search(idToSearch, startYearToSearch, endYearToSearch, nameKeywordsToSearch);
+
+                ArrayList<Product> storeCopy = new ArrayList<Product>();
+                for (Product p : StoreSearch.productAList) {
+                    storeCopy.add(p.deepCopy());
+                }
+                
+
+	            ArrayList<Product> results = search.doSearch(StoreSearch.productAList);
+	            System.out.println(results.toString());
+                textArea.setText("Results:\n");
+                for (Product s : results) {
+                    textArea.append(s.toString() + "\n\n");
+                }
+
+	        } catch(IllegalArgumentException error) {
+	        	System.out.println("Could not perform search");
+	        	String msg = "Error performing search: " + error.getMessage();
+            	JOptionPane.showMessageDialog(null, msg, "Error", JOptionPane.WARNING_MESSAGE);
+	        }
             
         }
     }

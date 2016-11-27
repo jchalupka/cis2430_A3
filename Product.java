@@ -1,5 +1,3 @@
-package edu.onlineStore;
-
 /**
  * Made By: Jordan Chalupka
  * Course: CIS*2430
@@ -7,7 +5,7 @@ package edu.onlineStore;
  *
  * Assignment 2
  */
-public class Product {
+public abstract class Product {
   protected String type;
   protected String id;
   protected String name;
@@ -27,6 +25,23 @@ public class Product {
     this.price = price;
   }
 
+  public Product (Product toCopy) {
+    this.id = toCopy.id;
+    this.name = toCopy.name;
+    this.year = toCopy.year;
+    this.price = toCopy.price;
+  }
+
+  public Product deepCopy() {
+    if (this instanceof Book) {
+      return new Book((Book)this);
+    } else if (this instanceof Electronic) {
+      return new Electronic((Electronic)this);
+    } else {
+      throw new Error("Unknown type of product");
+    }
+  }
+
   /**
    * checks to see if the inputs are acceptable for products
    * @param  id    product id
@@ -36,18 +51,22 @@ public class Product {
    * @return       if the inputs are acceptable for products
    */
   public static boolean invariantChecker(String id, String name, String year, String price) {
+    System.out.println("this " + id + "this");
+    if (id == null || name == null || year == " " || price == " ")
+      throw new IllegalArgumentException("Invalid input: input cannot be null");
+
   	// Check that the value is in between the min and max inclusive
     if (!isValidId(id))
-    	throw new IllegalArgumentException("invalid product id");
+    	throw new IllegalArgumentException("Invalid Product ID: ID must be 7 digits long");
 
     if (!isValidName(name))
-    	throw new IllegalArgumentException("invalid produce name");
+    	throw new IllegalArgumentException("Invalid Product Name");
 
     if (!isValidYear(year))
-    	throw new IllegalArgumentException("invalid product year");
+    	throw new IllegalArgumentException("Invalid Product Year: Year must be between 1000 and 9999");
 
     if (!isValidPrice(price))
-    	throw new IllegalArgumentException("invalid product price");
+    	throw new IllegalArgumentException("Invalid Product Price");
 
     return true;
   }
@@ -107,14 +126,16 @@ public class Product {
            "year = \"" + getYear() + "\""; 
   }
 
-  public boolean equals (Product otherProduct) {
-    if (otherProduct == null)
+  public boolean equals (Object otherProduct) {
+    if ((otherProduct == null) || (otherProduct.getClass() != this.getClass()))
       return false;
 
-    if (this.id.equals(otherProduct.id) && 
-        this.name.equals(otherProduct.name) && 
-        this.year.equals(otherProduct.year) &&
-        this.price.equals(otherProduct.price))
+    Product product = (Product) otherProduct;
+
+    if (this.id.equals(product.id) && 
+        this.name.equals(product.name) && 
+        this.year.equals(product.year) &&
+        this.price.equals(product.price))
       return true;
     else
       return false;
@@ -134,6 +155,7 @@ public class Product {
   }
 
   public static boolean isValidId (String id) {
+    System.out.println(id);
     boolean valid = id.length() == ID_LENGTH  && id.matches("[0-9]{6}");
     if (!valid) {
       System.out.format("Error: the Product ID must be %d digits.\n", ID_LENGTH);
@@ -146,7 +168,7 @@ public class Product {
   public static boolean isValidYear (String year) {
     boolean valid = year.matches("[1-9][0-9]{3}") /*&& inRange(Integer.parseInt(year), MIN_YEAR_VALUE, MAX_YEAR_VALUE,1)*/;
     if (!valid) {
-      System.out.println("Error: the year must be a number between 1000 and 9999.\n");
+      System.out.println(year + "Error: the year must be a number between 1000 and 9999.\n");
       return false;
     }
     return true;

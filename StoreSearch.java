@@ -1,5 +1,3 @@
-package edu.onlineStore;
-
 import java.util.*;
 /**
  * Made By: Jordan Chalupka
@@ -9,7 +7,7 @@ import java.util.*;
  * Assignment 2
  */
 public class StoreSearch {
-	static ArrayList<Product> productAList;
+	static ArrayList<Product> productAList = new ArrayList<Product>();
 
 	private static Scanner sc = new Scanner(System.in);
 
@@ -21,7 +19,7 @@ public class StoreSearch {
 	*/
 	public StoreSearch() {
 		// Two ArrayLists
-		this.productAList = new ArrayList<Product>();
+		productAList = new ArrayList<Product>();
 	}
 
 	/**
@@ -29,10 +27,12 @@ public class StoreSearch {
 	* The Product is checked to be guarenteed to have a unique ID to all other Products before being added.
 	* @param productToAdd is the Product to be added.
 	*/
-	public void addToStore (Product productToAdd) {
+	public static void addToStore (Product productToAdd) {
+		if (productToAdd == null)
+			throw new IllegalArgumentException("Invalid Product");
 		// Check for duplicates of the given productID
-		if (this.isUniqueId(productToAdd.getId())) {
-		  this.productAList.add(productToAdd);
+		if (isUniqueId(productToAdd.getId())) {
+		  productAList.add(productToAdd);
 		  HashMapSearch.updateHashMap(productToAdd);
 		}
 		else {
@@ -47,7 +47,7 @@ public class StoreSearch {
 	* Print out all of the products in the store.
 	*/
 	public void showProducts () {
-		Iterator currentProduct = this.productAList.iterator();
+		Iterator currentProduct = productAList.iterator();
 		while (currentProduct.hasNext()) {
 			System.out.println(currentProduct.next());
 		}
@@ -81,9 +81,9 @@ public class StoreSearch {
 	* @param  id Product Identification Number
 	* @return    True if the id is unique to the store object.
 	*/
-	public boolean isUniqueId (String id) {
+	public static boolean isUniqueId (String id) {
 		// Check for id in books
-		Iterator<Product> currentProduct = this.productAList.iterator();
+		Iterator<Product> currentProduct = productAList.iterator();
 		while (currentProduct.hasNext()) {
 		  if(currentProduct.next().getId().equals(id)) {
 			return false;
@@ -117,7 +117,7 @@ public class StoreSearch {
 	* @return    True if the id is unique to the store object.
 	*/
 	public boolean isUniqueId (Integer id) {
-		return this.isUniqueId(String.valueOf(id));
+		return isUniqueId(String.valueOf(id));
 	}
 
 	/**

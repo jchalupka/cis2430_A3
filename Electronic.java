@@ -1,5 +1,3 @@
-package edu.onlineStore;
-
 /**
  * Made By: Jordan Chalupka
  * Course: CIS*2430
@@ -12,10 +10,16 @@ public class Electronic extends Product {
 
   public Electronic (String id, String name, String year, String price, String maker) {
     super(id, name, year, price);
-        if (this.id != null) {
-            this.type = "electronic";
-            this.maker = maker;
-        }
+    if (this.id != null) {
+        this.type = "electronic";
+        this.maker = maker;
+    }
+  }
+
+  public Electronic(Electronic toCopy) {
+    super(toCopy);
+    this.type = toCopy.type;
+    this.maker = toCopy.maker;
   }
 
   public String getMaker () {
@@ -30,8 +34,12 @@ public class Electronic extends Product {
     return super.toString() + "\nmaker = \"" + getMaker() +"\"";
   }
 
-  public boolean equals (Electronic otherElectronic) {
-    return super.equals(otherElectronic) && this.maker.equals(otherElectronic.maker);
+  public boolean equals (Object otherElectronic) {
+    if ((otherElectronic == null) || (otherElectronic.getClass() != this.getClass()))
+      return false;
+    Electronic electronic = (Electronic)otherElectronic;
+    return super.equals(electronic) 
+      && this.maker.equals(electronic.maker);
   }
 
   public static void main(String[] args) {
